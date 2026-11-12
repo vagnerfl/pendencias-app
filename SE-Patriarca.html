@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1a3a52">
+    <meta name="description" content="Sistema de Gestão de Pendências - Trivia Trens">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Pendências">
+    <link rel="manifest" href="manifest.json">
+
+    <title>Pendências Gerais - Trivia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #1a3a52;
+            --primary-light: #2d5a7b;
+            --accent: #ff6b35;
+            --success: #10b981;
+            --danger: #ef4444;
+            --background: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 24px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(26, 58, 82, 0.15);
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .form-card {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--accent) 0%, #e74c3c 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .form-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .form-header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .form-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .required {
+            color: var(--danger);
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ff6b35' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 40px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--accent) 0%, #e74c3c 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-submit:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-reset:hover {
+            background: #d0d7e0;
+        }
+
+        .message {
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .message.loading {
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            color: #0c4a6e;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid currentColor;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .counter {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 16px 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            background: white;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px 16px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .container {
+                padding: 16px;
+            }
+
+            .form-body {
+                padding: 20px;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚙️ Pendências Gerais</h1>
+        <p>Trivia Trens - Sistema de Manutenção</p>
+    </div>
+
+    <div class="container">
+        <div class="form-card">
+            <div class="form-header">
+                <h2>📋 Registre uma Pendência</h2>
+                <p>Preencha os dados abaixo para registrar</p>
+            </div>
+
+            <div class="form-body">
+                <div id="message" class="message"></div>
+
+                <form id="form">
+                    <div class="form-group">
+                        <label for="local">Local <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            id="local"
+                            name="local"
+                            placeholder="Ex: BASE SGU, BASE CVN"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descritivo">Descritivo <span class="required">*</span></label>
+                        <textarea
+                            id="descritivo"
+                            name="descritivo"
+                            placeholder="Descreva a pendência detalhadamente"
+                            required
+                            maxlength="500"
+                        ></textarea>
+                        <div class="counter"><span id="charCount">0</span>/500</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="criticidade">Criticidade <span class="required">*</span></label>
+                        <select id="criticidade" name="criticidade" required>
+                            <option value="">-- Selecione --</option>
+                            <option value="Baixo">Baixo</option>
+                            <option value="Moderado">Moderado</option>
+                            <option value="Severo">Severo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status <span class="required">*</span></label>
+                        <select id="status" name="status" required>
+                            <option value="">-- Selecione --</option>
+                            <option value="Pendente">Pendente</option>
+                            <option value="Concluido">Concluído</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            📤 Enviar
+                        </button>
+                        <button type="reset" class="btn-reset">
+                            🔄 Limpar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>💼 Sistema de Gestão de Pendências | Trivia Trens</p>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/a/macros/triviatrens.com.br/s/AKfycbwFEM5k_zgKbKUuBpRYLkcuP2LUJ39IRXAH29Ren6Qnxof4U3CeE3zyQWJtkYvhpDjs/exec';
+
+        const form = document.getElementById('form');
+        const messageDiv = document.getElementById('message');
+        const submitBtn = document.getElementById('submitBtn');
+        const descritivo = document.getElementById('descritivo');
+        const charCount = document.getElementById('charCount');
+
+        // Contador de caracteres
+        descritivo.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+
+        // Envio do formulário
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Coleta dados
+            const data = {
+                local: document.getElementById('local').value.trim(),
+                descritivo: document.getElementById('descritivo').value.trim(),
+                criticidade: document.getElementById('criticidade').value,
+                status: document.getElementById('status').value
+            };
+
+            // Validação
+            if (!data.local || !data.descritivo || !data.criticidade || !data.status) {
+                showMessage('❌ Por favor, preencha todos os campos!', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            showMessage('<span class="spinner"></span>Enviando...', 'loading');
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('✅ Pendência registrada com sucesso!', 'success');
+                    form.reset();
+                    charCount.textContent = '0';
+
+                    setTimeout(() => {
+                        messageDiv.classList.remove('show');
+                    }, 3000);
+                } else {
+                    showMessage('❌ Erro: ' + (result.message || 'Tente novamente'), 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showMessage('❌ Erro de conexão. Verifique sua internet.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showMessage(text, type) {
+            messageDiv.innerHTML = text;
+            messageDiv.className = 'message show ' + type;
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => {
+                console.log('Service Worker não disponível');
+            });
+        }
+    </script>
+</body>
+</html>
